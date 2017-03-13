@@ -24,8 +24,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private EditText etInput;
     private Button btnSubmit;
-    private String  placeHolder = "\u001F";
-    private String  atHolder = "@";
+    private String  placeHolder = "\u001F";//空格占位符
+    private String  atHolder = "@";//@字符占位符
+    
 //    private String testStr = "中"+placeHolder+"国共"+placeHolder+"产党万"+placeHolder+
 //            "岁中国共"+placeHolder+"产党万岁a"+placeHolder;
 

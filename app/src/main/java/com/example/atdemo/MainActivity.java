@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button btnSubmit;
     private String  placeHolder = "\u001F";//空格占位符
     private String  atHolder = "@";//@字符占位符
-    
+
 //    private String testStr = "中"+placeHolder+"国共"+placeHolder+"产党万"+placeHolder+
 //            "岁中国共"+placeHolder+"产党万岁a"+placeHolder;
 
@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     int selectPos = etInput.getSelectionStart();
                     if(selectPos > 0){
                         String selectionStr =  String.valueOf(msgContent.charAt(selectPos-1));
-                        Log.e("attest","isNotShowAt222222222-===>"+isNotShowAt);
                         if(atHolder.equals(selectionStr) && !isNotShowAt){
                             if(selectPos == 1){
                                 showAt();
@@ -122,7 +121,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 && event.getAction() == KeyEvent.ACTION_DOWN) {
             String str = etInput.getText().toString();
             Editable edit = etInput.getEditableText();
-
             int selectPos = etInput.getSelectionStart();
             if(selectPos < 2){
                 isNotShowAt = false;
@@ -135,9 +133,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             lastAtpos = lastAtpos == -1 ? 0 : lastAtpos;
             int lastTabpos = str.lastIndexOf(placeHolder);
             boolean isDeleteAt =(lastTabpos+1) == selectPos;
-
-            Log.e("attest","isDeleteAt-===>"+isDeleteAt+"lastTabpos==>"+lastTabpos+"selectPos==>"+selectPos);
-
             if(isDeleteAt){
                 edit.delete(lastAtpos,lastTabpos+1);
                 return true;

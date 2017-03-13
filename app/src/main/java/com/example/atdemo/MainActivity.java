@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +24,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private EditText etInput;
     private Button btnSubmit;
+    private String  placeHolder = "\u001F";
+    private String  atHolder = "@";
+//    private String testStr = "中"+placeHolder+"国共"+placeHolder+"产党万"+placeHolder+
+//            "岁中国共"+placeHolder+"产党万岁a"+placeHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnSubmit= (Button)findViewById(R.id.btn_submit);
         btnSubmit.setOnClickListener(this);
         etInput.setOnKeyListener(this);
+//        etInput.setText(testStr);
         etInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
@@ -39,9 +45,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 String msgContent = charSequence.toString();
                 if (!TextUtils.isEmpty(msgContent)) {
-                    if(msgContent.endsWith("@")){
-                        Intent contactIntent = new Intent(MainActivity.this,ContactActivity.class);
-                        startActivityForResult(contactIntent,99);
+
+                    int selectPos = etInput.getSelectionStart();
+                    if(selectPos > 0){
+                        String selectionStr =  String.valueOf(msgContent.charAt(selectPos-1));
+                        Log.e("attest","isNotShowAt222222222-===>"+isNotShowAt);
+                        if(atHolder.equals(selectionStr) && !isNotShowAt){
+                            if(selectPos == 1){
+                                showAt();
+                            }else{
+                                String befourSelectionStr =  String.valueOf(msgContent.charAt(selectPos-2));
+                                boolean isChinese = CharUtil.isChinese(befourSelectionStr);
+                                if(atHolder.equals(befourSelectionStr) || placeHolder.equals(befourSelectionStr) || isChinese){
+                                    showAt();
+                                }
+                            }
+                        }
                     }
                     checkAtValid(msgContent);
                 }
@@ -49,6 +68,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void afterTextChanged(Editable editable) {}
         });
+    }
+    private void showAt(){
+        Intent contactIntent = new Intent(MainActivity.this,ContactActivity.class);
+        startActivityForResult(contactIntent,99);
     }
     private HashMap<String,String> atMap = new HashMap<>();
     private void checkAtValid(String msgContent) {
@@ -80,13 +103,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(requestCode == 99 && resultCode == RESULT_OK){
             String id = data.getStringExtra("id");
             String name = data.getStringExtra("name");
-            String textInputTemp = etInput.getText().toString();
-            etInput.setText(textInputTemp+name+"\t");
-            etInput.setSelection(etInput.getText().length());
 
-            atMap.put("@"+name,id);
+            int index = etInput.getSelectionStart();//获取光标所在位置
+            Editable edit = etInput.getEditableText();
+            if (index < 0 || index >= edit.length() ){
+                edit.append(name+placeHolder);
+            }else{
+                edit.insert(index,name+placeHolder);//光标所在位置插入文字
+            }
+            atMap.put(atHolder+name,id);
         }
     }
+    private boolean isNotShowAt = false;
     @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_DEL
@@ -95,11 +123,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Editable edit = etInput.getEditableText();
 
             int selectPos = etInput.getSelectionStart();
+            if(selectPos < 2){
+                isNotShowAt = false;
+            }else{
+                String deleteSelectionStr =  String.valueOf(str.charAt(selectPos-2));
+                isNotShowAt = atHolder.equals(deleteSelectionStr);
+            }
             selectPos = selectPos == 0? -1 : selectPos;
-            int lastAtpos = str.lastIndexOf("@");
+            int lastAtpos = str.lastIndexOf(atHolder);
             lastAtpos = lastAtpos == -1 ? 0 : lastAtpos;
-            int lastTabpos = str.lastIndexOf("\t");
+            int lastTabpos = str.lastIndexOf(placeHolder);
             boolean isDeleteAt =(lastTabpos+1) == selectPos;
+
+            Log.e("attest","isDeleteAt-===>"+isDeleteAt+"lastTabpos==>"+lastTabpos+"selectPos==>"+selectPos);
+
             if(isDeleteAt){
                 edit.delete(lastAtpos,lastTabpos+1);
                 return true;
